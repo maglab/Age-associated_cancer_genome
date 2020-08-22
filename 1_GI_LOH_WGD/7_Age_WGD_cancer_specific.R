@@ -143,6 +143,7 @@ wgd_age <- function(project){
   
   write.csv(result, paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", project, "_multivariate_age_WGD.csv", collapse = ""), row.names = FALSE)
   
+  ### Fig. 1e
   pdf(paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", project, "_multivariate_age_WGD.pdf", collapse = ""), width = 3, height = 4) 
   my_label <- paste0("p = ", p_value)
   p <- ggplot(df_tmp, aes(x=wgd, y=age, fill=wgd)) + 

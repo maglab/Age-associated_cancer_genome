@@ -59,6 +59,7 @@ result <- as.data.frame(parameters::parameters(logit_fit))
 
 write.csv(result, "Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_multivariate_age_WGD.csv", row.names = FALSE)
 
+### Fig. 1e
 pdf("Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_multivariate_age_WGD.pdf", width = 3, height = 4) 
 my_label <- paste0("p = ", p_value)
 p <- ggplot(df, aes(x=wgd, y=age, fill=wgd)) +
