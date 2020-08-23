@@ -21,7 +21,15 @@ logit_fit <- glm(wgd ~ age , data = df, family = "binomial")
 summary(logit_fit)
 result <- tidy(logit_fit)
 p_value <- formatC(as.numeric(summary(logit_fit)$coefficients[,4][2]), format = "e", digits = 2)
-result <- as.data.frame(parameters::parameters(logit_fit))
+CI <- confint.default(logit_fit, level = 0.95)
+result <- cbind(as.data.frame(result), CI)
+result <- result[,c("term", "estimate", "std.error", "statistic", "2.5 %", "97.5 %", "p.value")]
+colnames(result) <- c("term", "estimate", "std.error", "statistic", "conf.low", "conf.high", "p.value")
+result$odds <- exp(result$estimate)
+result$odds_conf.low <- exp(result$conf.low)
+result$odds_conf.high <- exp(result$conf.high)
+result <- result[,c("term", "estimate", "std.error", "conf.low", "conf.high",
+                    "statistic", "odds", "odds_conf.low", "odds_conf.high", "p.value")]
 write.csv(result, "Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_univariate_age_WGD.csv", row.names = FALSE)
 
 pdf("Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_univariate_age_WGD.pdf", width = 3, height = 4) 
@@ -55,7 +63,15 @@ summary(logit_fit)
 
 result <- tidy(logit_fit)
 p_value <- formatC(as.numeric(summary(logit_fit)$coefficients[,4][2]), format = "e", digits = 2)
-result <- as.data.frame(parameters::parameters(logit_fit))
+CI <- confint.default(logit_fit, level = 0.95)
+result <- cbind(as.data.frame(result), CI)
+result <- result[,c("term", "estimate", "std.error", "statistic", "2.5 %", "97.5 %", "p.value")]
+colnames(result) <- c("term", "estimate", "std.error", "statistic", "conf.low", "conf.high", "p.value")
+result$odds <- exp(result$estimate)
+result$odds_conf.low <- exp(result$conf.low)
+result$odds_conf.high <- exp(result$conf.high)
+result <- result[,c("term", "estimate", "std.error", "conf.low", "conf.high",
+                    "statistic", "odds", "odds_conf.low", "odds_conf.high", "p.value")]
 
 write.csv(result, "Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_multivariate_age_WGD.csv", row.names = FALSE)
 

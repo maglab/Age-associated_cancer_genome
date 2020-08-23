@@ -613,6 +613,6 @@ dev.off()
 # - Grey: not significant
 # - Red: significant and positive coefficient
 # - Blue: significant and negative coefficient
-# - Black: significant in univariate but not in multivariate analyses
+# - Black: significant in simple but not in multiple regression analyses
 # Size corresponses to median SCNA score.
 

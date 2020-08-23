@@ -27,7 +27,16 @@ WGD_age <- function(cancer_type){
   coeff <- summary(logit_fit)$coefficients[,1][2]
   
   result <- tidy(logit_fit)
-  result <- as.data.frame(parameters::parameters(logit_fit))
+  CI <- confint.default(logit_fit, level = 0.95)
+  result <- cbind(as.data.frame(result), CI)
+  result <- result[,c("term", "estimate", "std.error", "statistic", "2.5 %", "97.5 %", "p.value")]
+  colnames(result) <- c("term", "estimate", "std.error", "statistic", "conf.low", "conf.high", "p.value")
+  result$odds <- exp(result$estimate)
+  result$odds_conf.low <- exp(result$conf.low)
+  result$odds_conf.high <- exp(result$conf.high)
+  result <- result[,c("term", "estimate", "std.error", "conf.low", "conf.high",
+                      "statistic", "odds", "odds_conf.low", "odds_conf.high", "p.value")]
+  
   write.csv(result, paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", cancer_type, "_univariate_age_WGD.csv", collapse = ""), row.names = FALSE)
   
   pdf(paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", cancer_type, "_univariate_age_WGD.pdf", collapse = ""), width = 3, height = 4) 
@@ -53,9 +62,10 @@ WGD_age <- function(cancer_type){
   dev.off()
 
   
-  result_df <- as.data.frame(result[2,])
-  result_df$Parameter <- cancer_type
-  colnames(result_df) <- c("cancer_type", "coefficient", "std.error", "CI_low", "CI_high", "z", "df_error", "p.value")
+  result_df <- as.data.frame(result[result$term == "age",])
+  result_df$term <- cancer_type
+  colnames(result_df) <- c("cancer_type", "estimate", "std.error", "conf.low", "conf.high", "statistic",
+                           "odds", "odds_conf.low", "odds_conf.high", "p.value")
   return(result_df)
 }
 
