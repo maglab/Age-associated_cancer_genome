@@ -31,29 +31,29 @@ GI_age <- function(cancer_type){
   coeff <- summary(lm_fit)$coefficients[,1][2]
   
   result <- tidy(lm_fit)
-  #write.csv(result, paste0("Analysis_results/Structural_Alterations/1_Age_GIscore/", cancer_type, "_univariate_age_GIscore.csv", collapse = ""), row.names = FALSE)
+  write.csv(result, paste0("Analysis_results/Structural_Alterations/1_Age_GIscore/", cancer_type, "_univariate_age_GIscore.csv", collapse = ""), row.names = FALSE)
   
   my_label <- paste0("R-squared = ", r_squared, "\np = ", p_value)
-  #pdf(paste0("Analysis_results/Structural_Alterations/1_Age_GIscore/", cancer_type, "_univariate_age_GIscore.pdf", collapse = ""), width = 6, height = 4.5) 
+  pdf(paste0("Analysis_results/Structural_Alterations/1_Age_GIscore/", cancer_type, "_univariate_age_GIscore.pdf", collapse = ""), width = 6, height = 4.5, useDingbats=FALSE) 
   p <- ggplot(data = df, aes(x = age, y = gi)) + 
     geom_point(color='black') +
     geom_smooth(method = "lm") +
     ggtitle(cancer_type) +
     xlab("Age at diagnosis") +
     ylab("GI score") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
           legend.title = element_blank(),
-          legend.text = element_text(size = 10, face="bold"),
+          legend.text = element_text(size = 14, face="bold"),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, size = 5,
+    annotate("label", x=-Inf, y = Inf, size = 6,
              label = my_label, hjust=0, vjust=1)
   print(p)
-  #dev.off()
+  dev.off()
   
   result_df <- as.data.frame(result[2,])
   result_df$term <- cancer_type
@@ -143,6 +143,8 @@ gi_age <- function(project){
   df_tmp <- merge(df_tmp, clin, by.x = "patient", by.y = "patient")
   head(df_tmp)
   
+  write.csv(df_tmp, paste0("Source_Data/Supplementary_Fig_1a_", project, ".csv"), row.names = FALSE)
+  
   model <- model_selection(project)
   lm_fit <- lm(formula = model, data=df_tmp)  # fit linear model
   summary(lm_fit)
@@ -153,23 +155,23 @@ gi_age <- function(project){
   my_label <- paste0("adj. R-squared = ", r_squared, "\np = ", p_value)
 
   ### Supplementary Fig. 1a
-  pdf(paste0("Analysis_results/Structural_Alterations/1_Age_GIscore/", project, "_multivariate_age_GIscore.pdf", collapse = ""), width = 6, height = 4.5) 
+  pdf(paste0("Analysis_results/Structural_Alterations/1_Age_GIscore/", project, "_multivariate_age_GIscore.pdf", collapse = ""), width = 6, height = 4.5, useDingbats=FALSE) 
   p <- ggplot(data = df_tmp, aes(x = age, y = gi)) + 
     geom_point(color='black') +
     geom_smooth(method = "lm") +
     ggtitle(project) +
     xlab("Age at diagnosis") +
     ylab("GI score") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
           legend.title = element_blank(),
-          legend.text = element_text(size = 10, face="bold"),
+          legend.text = element_text(size = 14, face="bold"),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, size = 5,
+    annotate("label", x=-Inf, y = Inf, size = 6,
              label = my_label, hjust=0, vjust=1)
   print(p)
   dev.off()
@@ -196,7 +198,7 @@ results$q.value <- p.adjust(results$p.value, method = "BH")
 
 results$Sig <- ifelse(results$q.value < 0.05, TRUE, FALSE)
 write.csv(results, "Analysis_results/Structural_Alterations/1_Age_GIscore/Summary_Association_Age_multivariate_GIscore.csv", row.names = FALSE)
-
+write.csv(results, "Source_Data/Fig_1b.csv", row.names = FALSE)
 
 ### Fig. 1b Volcano plot ##################################################################################
 ### add information on whether each cancer still showed a significant association after multiple regression
@@ -217,7 +219,7 @@ for(i in 1:nrow(GI_result)){
 
 GI_result$my_colour <- factor(my_colour)
 
-pdf("Analysis_results/Structural_Alterations/1_Age_GIscore/Summary_multivariate_age_GIscore.pdf", width = 6, height = 4.5) 
+pdf("Analysis_results/Structural_Alterations/1_Age_GIscore/Summary_multivariate_age_GIscore.pdf", width = 6, height = 4.5, useDingbats=FALSE) 
 p <- ggplot(aes(x = estimate, y = -log10(q.value), size = median_GI, 
                 color = my_colour, label = cancer_type), data = GI_result) +
   geom_point() +
@@ -225,19 +227,19 @@ p <- ggplot(aes(x = estimate, y = -log10(q.value), size = median_GI,
   scale_size_continuous(range = c(1, 4)) +
   xlab("Regression coefficient") +
   ylab("-log10(adjusted p-value)") +
-  ggtitle("Association between age and GI score by cancer type") +
-  xlim(c(-0.0075,0.0075)) +
-  geom_label_repel(size = 3) +
+  ggtitle("Age and GI score by cancer type") +
+  xlim(c(-0.0085,0.0085)) +
+  geom_label_repel(size = 4) +
   geom_hline(
     yintercept = c(-log10(0.05),-log10(0.05)),
     col = "#bdbdbd",
     linetype = "dashed",
     size = 0.5)+
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size=15,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
         legend.position = "none",
         panel.background = element_blank(),
         axis.line = element_line(colour = "black"))

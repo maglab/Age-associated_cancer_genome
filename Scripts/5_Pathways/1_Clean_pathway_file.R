@@ -1,7 +1,6 @@
 ### Keep only samples in ASCAT output and those that have age information
-
+# pathway information is from Sanchez-Vega, F. et al. Oncogenic Signaling Pathways in The Cancer Genome Atlas. Cell 173, 321-337 e310, doi:10.1016/j.cell.2018.03.035 (2018).
 setwd("/Users/kasitchatsirisupachai/Desktop/Age_differences_cancer")
-
 
 ### Read data
 # clinical

@@ -1,6 +1,6 @@
 ### Correlation between copy-number from GISTIC2 and gene expression
 ### regression by dividing samples into 1) "Highly Loss", 2) "Loss", 3) "No Change", 4) "Gain", 5) "Highly Gain"
-### then modelled gene expression using CNA status and purity
+### then modelled gene expression using CNA status
 ### Fig. 3e
 setwd("/Users/kasitchatsirisupachai/Desktop/Age_differences_cancer")
 
@@ -80,6 +80,9 @@ gene_corr <- function(gene, cancer_type, GISTIC, expression, GainOrLoss){
   levels(tmp_df$CNA_status) <- c(levels(tmp_df$CNA_status), missing_levels)
   tmp_df$CNA_status <- ordered(tmp_df$CNA_status, levels = all_levels)  # reorder levels
   
+  # write source data
+  #write.csv(tmp_df, paste0("Source_Data/Fig_3e_", cancer_type, "_", gene, ".csv", collapse = ""), row.names = FALSE)
+  
   # plot
   my_label <- paste0("r = ", r_plot, "\np = ", p_plot)
   p <- ggplot(tmp_df, aes(x = CNA_status, y = expression, fill = CNA_status, group = CNA_status)) + 
@@ -89,15 +92,15 @@ gene_corr <- function(gene, cancer_type, GISTIC, expression, GainOrLoss){
     scale_x_discrete(limits = c("Highly Loss", "Loss", "No Change", "Gain", "Highly Gain")) +
     labs(title = paste0(cancer_type, ": ", gene), 
          x = "SCNAs", y = "log2(normalised RSEM + 1)") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 11, angle = 45, hjust = 1),
-          axis.text.y = element_text(size = 11),
-          axis.title.x = element_text(size=11,face="bold"),
-          axis.title.y = element_text(size=11,face="bold"),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15, angle = 45, hjust = 1),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
           legend.position = "none",
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, size = 5,
+    annotate("label", x=-Inf, y = Inf, size = 6,
              label = my_label, hjust=0, vjust=1)
   
   pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/SCNAs_gene_expression/", 

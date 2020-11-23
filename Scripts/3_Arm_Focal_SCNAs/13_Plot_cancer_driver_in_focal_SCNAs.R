@@ -111,22 +111,25 @@ df[is.na(df)] <- ""
 cols <- c("loss - decrease" = "#2b83ba", "loss - increase" = "#abdda4", 
           "gain - decrease" = "#fdae61", "gain - increase" = "#d7191c")
 
+# write source data
+write.csv(gene_df, "Source_Data/Fig_3d.csv", row.names = FALSE)
+
 ### Fig. 3d
-pdf("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/Age-associated_SCNA_in_cancer_gene.pdf", width = 12.5, height = 4) 
+pdf("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/Age-associated_SCNA_in_cancer_gene.pdf", width = 15, height = 4, useDingbats=FALSE) 
 p <- ggplot(data = gene_df, aes(x=gene, y=cancer_type, fill=condition)) +
-  geom_point(size = 3, colour="black", pch=21) +
+  geom_point(size = 4, colour="black", pch=21) +
   scale_fill_manual(values = cols, labels=c("Decrease gain", "Increase gain", 
                                             "Decrease loss", "Increase loss")) +
   scale_y_discrete(limits = rev(levels(gene_df$cancer_type))) +
   ggtitle("Age-associated SCNA changes in cancer driver genes") +
   xlab("Gene") + ylab("Cancer type") +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 9, angle = 90, vjust = 0.5, hjust = 1),
-        axis.text.y = element_text(size = 9),
-        axis.title.x = element_text(size=10,face="bold"),
-        axis.title.y = element_text(size=10,face="bold"),
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 12, angle = 90, vjust = 0.5, hjust = 1),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size=12,face="bold"),
+        axis.title.y = element_text(size=12,face="bold"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 8),
+        legend.text = element_text(size = 10),
         panel.background = element_blank(),
         panel.border = element_rect(linetype = "solid", fill = NA),
         panel.grid.major = element_line(colour = "#d9d9d9"),

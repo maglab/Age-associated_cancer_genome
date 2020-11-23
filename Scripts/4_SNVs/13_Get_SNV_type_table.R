@@ -60,6 +60,14 @@ mut_type_sample_table <- function(project){
   # filter only samples with less than 1000 mutations
   maf <- maf[maf$Patient_ID %in% patient_ID_keep,]
   
+  # remove MSI-H tumours from COAD, READ, STAD, UCEC
+  if(project %in% c("COAD", "READ", "STAD", "UCEC")){
+    # read MSI status file
+    MSI <- read.csv(paste0("Data/MSI_Status/", project, "_MSI_Status.csv", collapse = ""))
+    MSI_patients <- as.character(MSI[MSI$mononucleotide_and_dinucleotide_marker_panel_analysis_status == "MSI-H",]$bcr_patient_barcode)
+    maf <- maf[!(maf$Patient_ID %in% MSI_patients),]
+  }
+  
   num_samples <- length(unique(as.character(maf$Patient_ID)))
   
   all_samples <- unique(as.character(maf$Patient_ID))

@@ -55,27 +55,34 @@ MSI_H_age <- function(project){
   
   model <- model_selection(project)
   
+  # write source data
+  if(project == "UCEC"){
+    write.csv(df, "Source_Data/Fig_4c.csv", row.names = FALSE)
+  }else{
+    write.csv(df, paste0("Source_Data/Supplementary_Fig_8a_", project, ".csv", collapse = ""), row.names = FALSE)
+  }
+  
   # logistic regression
   logit_fit <- logistf(formula = model, data = df, family = "binomial")
   summary(logit_fit)
   result <- broomExtra::tidy_parameters(logit_fit)
   p_value <- round(result$p.value[2],4)
-  write.csv(result, "Analysis_results/Mutations/5_UCEC_low_burden_age_SNVs/UCEC_MSI_with_age.csv", row.names = FALSE)
+  #write.csv(result, "Analysis_results/Mutations/5_UCEC_low_burden_age_SNVs/UCEC_MSI_with_age.csv", row.names = FALSE)
   
-  ### Fig. 4b and Supplementary Fig. 6a
+  ### Fig. 4c and Supplementary Fig. 8a
   my_label <- paste0("p = ", p_value)
-  pdf("Analysis_results/Mutations/5_UCEC_low_burden_age_SNVs/UCEC_MSI_with_age.pdf", width = 3, height = 4) 
+  pdf(paste0("Analysis_results/Mutations/5_UCEC_low_burden_age_SNVs/", project, "_MSI_with_age.pdf", collapse = ""), width = 3, height = 4, useDingbats=FALSE) 
   p <- ggplot(aes(x = MSI, y = age, fill = MSI), data = df) + 
     geom_violin(trim = FALSE, scale = "width") + 
     geom_boxplot(width = 0.4, fill = "white") +
-    ggtitle("UCEC: MSI-H and age") +
+    ggtitle(paste0(project, ": MSI-H and age", collapse = "")) +
     xlab("MSI-H") +
     ylab("Age at diagnosis") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 14),
+          axis.text.y = element_text(size = 14),
+          axis.title.x = element_text(size=14,face="bold"),
+          axis.title.y = element_text(size=14,face="bold"),
           legend.title = element_blank(),
           legend.position = "none",
           panel.background = element_blank(),

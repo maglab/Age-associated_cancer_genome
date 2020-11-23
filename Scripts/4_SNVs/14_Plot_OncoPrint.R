@@ -1,5 +1,5 @@
 ### Oncoprint of age biases in mutations (multiple logistic regrssion)
-### Fig. 4f and Supplementary Fig. 7
+### Fig. 4g and Supplementary Fig. 9
 setwd("/Users/kasitchatsirisupachai/Desktop/Age_differences_cancer/")
 
 library(ComplexHeatmap)
@@ -67,20 +67,31 @@ mut_oncoprint <- function(project, clinical){
   mut_type <- mut_type[,as.character(annot_df$patient)]
   mut_type <- as.matrix(mut_type)
   
+  # write source data
+  if(project %in% c("LGG", "GBM")){
+    write.csv(mut_type, paste0("Source_Data/Fig_4g_", project, ".csv"))
+  } else {
+    write.csv(mut_type, paste0("Source_Data/Supplementary_Fig_9_", project, ".csv"))
+  }
+  
   # annotation age and mut burden
   ha <- columnAnnotation(age = age, 
-                         mutation_burden = anno_points(total_mut, ylim = c(0, ceiling(max(total_mut))), axis = TRUE),
+                         mutational_burden = anno_points(total_mut, ylim = c(0, ceiling(max(total_mut))), axis = TRUE),
                          col = list(age = colorRamp2(c(min(age), max(age)), c("#edf8b1", "#1d91c0"))),
                          annotation_legend_param = list(age = list(title = "age", 
                                                                    at = c(min(age), median(age), max(age)),
-                                                                   labels = c(min(age), median(age), max(age)))))
+                                                                   labels = c(min(age), median(age), max(age)),
+                                                                   title_gp = gpar(fontsize=13, fontface="bold"),
+                                                                   labels_gp = gpar(fontsize=13))))
   ha
   
   # annotation increase or decrease freq with age
   annot_direction <- df[,c("gene", "direction")]
   
   row_ha <- rowAnnotation(direction = as.character(annot_direction$direction),
-                          col = list(direction = c("increase" = "#fdae61", "decrease" = "#7bccc4")))
+                          col = list(direction = c("increase" = "#fdae61", "decrease" = "#7bccc4")),
+                          annotation_legend_param = list(title_gp = gpar(fontsize=13, fontface="bold"),
+                                                         labels_gp = gpar(fontsize=13)))
   
   col <- c(Frame_Shift_Del = "#6a3d9a", Frame_Shift_Ins = "#1f78b4", In_Frame_Del = "#fb9a99",
            In_Frame_Ins = "#80b1d3", Missense_Mutation = "#33a02c", Nonsense_Mutation = "#e31a1c",
@@ -110,12 +121,20 @@ mut_oncoprint <- function(project, clinical){
                                               gp = gpar(fill = col["Multiple"], col = NA)))
   
   height_pdf = (length(genes) * 0.5) + 2
-  pdf(paste0("Analysis_results/Mutations/3.3_Age_SNVs_heatmap/", project, "_age_SNVs_heatmap_new.pdf"), width = 12, height = height_pdf) 
+  pdf(paste0("Analysis_results/Mutations/3.3_Age_SNVs_heatmap/", project, "_age_SNVs_heatmap_new.pdf"), width = 12, height = height_pdf, useDingbats=FALSE) 
   p <- oncoPrint(mut_type, alter_fun = alter_fun, col = col,
                  remove_empty_columns = FALSE,
                  right_annotation = row_ha,
-                 column_order = as.character(annot_df$patient),top_annotation = ha,
-                 column_title = project)
+                 column_order = as.character(annot_df$patient),
+                 top_annotation = ha,
+                 column_title = project,
+                 column_title_gp = gpar(fontsize = 16, fontface = "bold"),
+                 row_title_gp = gpar(fontsize = 14),
+                 row_names_gp = gpar(fontsize = 14),
+                 pct_gp = gpar(fontsize = 14),
+                 heatmap_legend_param = list(title = "Alterations",
+                                             title_gp = gpar(fontsize = 13, fontface = "bold"), 
+                                             labels_gp = gpar(fontsize = 13)))
   print(p)
   dev.off()
 

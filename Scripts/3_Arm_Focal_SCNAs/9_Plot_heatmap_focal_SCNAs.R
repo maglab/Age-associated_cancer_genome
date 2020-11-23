@@ -1,5 +1,5 @@
 ### plot heatmap of focal-level CNAs of the regions that significantly associated with age
-### Fig. 3b-c and Supplementary Fig. 4
+### Fig. 3b-c and Supplementary Fig. 6
 setwd("/Users/kasitchatsirisupachai/Desktop/Age_differences_cancer")
 
 library(ggplot2)
@@ -78,7 +78,9 @@ plot_CNAs <- function(project){
                          col = list(age = colorRamp2(c(min(age), max(age)), c("#edf8b1", "#1d91c0"))),
                          annotation_legend_param = list(title = "age", 
                                                         at = c(min(age), median(age), max(age)),
-                                                        labels = c(min(age), median(age), max(age))),
+                                                        labels = c(min(age), median(age), max(age)),
+                                                        title_gp = gpar(fontsize=14, fontface="bold"),
+                                                        labels_gp = gpar(fontsize=14)),
                          annotation_name_side = "left")
   ha
   
@@ -88,18 +90,29 @@ plot_CNAs <- function(project){
   row_ha <- rowAnnotation(direction = annot_direction$direction,
                           gain_or_loss = annot_direction$GainOrLoss,
                           col = list(direction = c("increase" = "#fdae61", "decrease" = "#7bccc4"),
-                                     gain_or_loss = c("gain" = "#a50026", "loss" = "#313695")))
+                                     gain_or_loss = c("gain" = "#a50026", "loss" = "#313695")),
+                          annotation_legend_param = list(title_gp = gpar(fontsize=14, fontface="bold"),
+                                                         labels_gp = gpar(fontsize=14)))
   
   # sort df by age
   values_focal <- values_focal[,as.character(annot_df$patient)]
   values_focal <- as.matrix(values_focal)
+  
+  # save source data
+  if(project == "LGG"){
+    write.csv(values_focal, "Source_Data/Fig_3b.csv")
+  } else {
+    write.csv(values_focal, paste0("Source_Data/Supplementary_Fig_6_", project, ".csv", collapse = ""))
+  }
   
   #values_focal <- values_focal[complete.cases(values_focal),]
   
   ### heatmap
   my_col = colorRamp2(c(min(values_focal), 0, max(values_focal)), c("#1d91c0", "white", "#bd0026"))
   
-  pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/GISTIC_focal_heatmap/", project, "_focal_heatmap.pdf", collapse = ""), width = 10, height = 6)
+  height_pdf = (nrow(values_focal) * 0.3) + 1.5
+  pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/GISTIC_focal_heatmap/", project, "_focal_heatmap.pdf", collapse = ""), 
+      width = 10, height = height_pdf, useDingbats=FALSE)
   p <- Heatmap(values_focal, name = "Copy Number Changes", cluster_columns = FALSE, cluster_rows = FALSE,
                show_row_names = TRUE,
                row_names_side = "left",
@@ -107,12 +120,16 @@ plot_CNAs <- function(project){
                col = my_col,
                bottom_annotation = ha,
                right_annotation = row_ha,
-               column_title = project)
+               column_title = project,
+               column_title_gp = gpar(fontsize = 18, fontface = "bold"),
+               row_names_gp = gpar(fontsize = 16),
+               heatmap_legend_param = list(title = "CN changes",
+                                          title_gp = gpar(fontsize = 14, fontface = "bold"), 
+                                          labels_gp = gpar(fontsize = 14)))
   
   print(p)
   dev.off()
 
-  
 }
 
 lapply(cancer_types[cancer_types != "UCEC"], plot_CNAs)   # UCEC has the region that sig. for both gain and loss
@@ -162,7 +179,9 @@ ha <- columnAnnotation(age = age,
                        col = list(age = colorRamp2(c(min(age), max(age)), c("#edf8b1", "#1d91c0"))),
                        annotation_legend_param = list(title = "age", 
                                                       at = c(min(age), median(age), max(age)),
-                                                      labels = c(min(age), median(age), max(age))),
+                                                      labels = c(min(age), median(age), max(age)),
+                                                      title_gp = gpar(fontsize=14, fontface="bold"),
+                                                      labels_gp = gpar(fontsize=14)),
                        annotation_name_side = "left")
 ha
 
@@ -172,18 +191,25 @@ annot_direction <- gain_df[,c("region", "direction", "GainOrLoss"),]
 row_ha <- rowAnnotation(direction = annot_direction$direction,
                         gain_or_loss = annot_direction$GainOrLoss,
                         col = list(direction = c("increase" = "#fdae61", "decrease" = "#7bccc4"),
-                                   gain_or_loss = c("gain" = "#a50026", "loss" = "#313695")))
+                                   gain_or_loss = c("gain" = "#a50026", "loss" = "#313695")),
+                        annotation_legend_param = list(title_gp = gpar(fontsize=14, fontface="bold"),
+                                                       labels_gp = gpar(fontsize=14)))
 
 # sort df by age
 values_focal <- values_focal[,as.character(annot_df$patient)]
 values_focal <- as.matrix(values_focal)
+
+# save source data
+write.csv(values_focal, "Source_Data/Fig_3c_gain.csv", row.names = FALSE)
 
 #values_focal <- values_focal[complete.cases(values_focal),]
 
 ### heatmap
 my_col = colorRamp2(c(min(values_focal), 0, max(values_focal)), c("#1d91c0", "white", "#bd0026"))
 
-pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/GISTIC_focal_heatmap/", project, "_focal_heatmap_gain.pdf", collapse = ""), width = 10, height = 6)
+height_pdf = (nrow(values_focal) * 0.25) + 1.5
+pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/GISTIC_focal_heatmap/", project, "_focal_heatmap_gain.pdf", collapse = ""), 
+    width = 10, height = height_pdf, useDingbats=FALSE)
 p <- Heatmap(values_focal, name = "Copy Number Changes", cluster_columns = FALSE, cluster_rows = FALSE,
              show_row_names = TRUE,
              row_names_side = "left",
@@ -191,7 +217,12 @@ p <- Heatmap(values_focal, name = "Copy Number Changes", cluster_columns = FALSE
              col = my_col,
              bottom_annotation = ha,
              right_annotation = row_ha,
-             column_title = "UCEC Gain")
+             column_title = "UCEC Gain",
+             column_title_gp = gpar(fontsize = 18, fontface = "bold"),
+             row_names_gp = gpar(fontsize = 16),
+             heatmap_legend_param = list(title = "CN changes",
+                                         title_gp = gpar(fontsize = 14, fontface = "bold"), 
+                                         labels_gp = gpar(fontsize = 14)))
 
 print(p)
 dev.off()
@@ -223,7 +254,9 @@ ha <- columnAnnotation(age = age,
                        col = list(age = colorRamp2(c(min(age), max(age)), c("#edf8b1", "#1d91c0"))),
                        annotation_legend_param = list(title = "age", 
                                                       at = c(min(age), median(age), max(age)),
-                                                      labels = c(min(age), median(age), max(age))),
+                                                      labels = c(min(age), median(age), max(age)),
+                                                      title_gp = gpar(fontsize=14, fontface="bold"),
+                                                      labels_gp = gpar(fontsize=14)),
                        annotation_name_side = "left")
 ha
 
@@ -233,18 +266,25 @@ annot_direction <- loss_df[,c("region", "direction", "GainOrLoss"),]
 row_ha <- rowAnnotation(direction = annot_direction$direction,
                         gain_or_loss = annot_direction$GainOrLoss,
                         col = list(direction = c("increase" = "#fdae61", "decrease" = "#7bccc4"),
-                                   gain_or_loss = c("gain" = "#a50026", "loss" = "#313695")))
+                                   gain_or_loss = c("gain" = "#a50026", "loss" = "#313695")),
+                        annotation_legend_param = list(title_gp = gpar(fontsize=14, fontface="bold"),
+                                                       labels_gp = gpar(fontsize=14)))
 
 # sort df by age
 values_focal <- values_focal[,as.character(annot_df$patient)]
 values_focal <- as.matrix(values_focal)
+
+# save source data
+write.csv(values_focal, "Source_Data/Fig_3c_loss.csv", row.names = FALSE)
 
 #values_focal <- values_focal[complete.cases(values_focal),]
 
 ### heatmap
 my_col = colorRamp2(c(min(values_focal), 0, max(values_focal)), c("#1d91c0", "white", "#bd0026"))
 
-pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/GISTIC_focal_heatmap/", project, "_focal_heatmap_loss.pdf", collapse = ""), width = 10, height = 6)
+height_pdf = (nrow(values_focal) * 0.25) + 1.5
+pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_focal_new/GISTIC_focal_heatmap/", project, "_focal_heatmap_del.pdf", collapse = ""),
+    width = 10, height = height_pdf, useDingbats=FALSE)
 p <- Heatmap(values_focal, name = "Copy Number Changes", cluster_columns = FALSE, cluster_rows = FALSE,
              show_row_names = TRUE,
              row_names_side = "left",
@@ -252,7 +292,12 @@ p <- Heatmap(values_focal, name = "Copy Number Changes", cluster_columns = FALSE
              col = my_col,
              bottom_annotation = ha,
              right_annotation = row_ha,
-             column_title = "UCEC Loss")
+             column_title = "UCEC Loss",
+             column_title_gp = gpar(fontsize = 18, fontface = "bold"),
+             row_names_gp = gpar(fontsize = 16),
+             heatmap_legend_param = list(title = "CN changes",
+                                         title_gp = gpar(fontsize = 14, fontface = "bold"), 
+                                         labels_gp = gpar(fontsize = 14)))
 
 print(p)
 dev.off()

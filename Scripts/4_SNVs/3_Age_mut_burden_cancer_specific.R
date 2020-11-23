@@ -7,6 +7,7 @@ library(broom)
 ### read data
 clinical <- read.csv("Data/all_clin_XML.csv")
 projects <- unique(as.character(clinical$cancer_type))
+purity <- read.table("Data/TCGA.purity.txt", header = TRUE)
 
 # clean id function
 clean_id <- function(id){
@@ -125,6 +126,9 @@ mut_burden_multiple <- function(project, purity){
   
   mut_burden_df <- merge(mut_burden_df, purity, by.x = "Tumor_Sample_Barcode", by.y = "patient")
   
+  # write source data
+  write.csv(mut_burden_df, paste0("Source_Data/Supplementary_Fig_7a_", project, ".csv", collapse = ""), row.names = FALSE)
+  
   model <- model_selection(project)
   
   # linear regression age and mutational burden
@@ -140,7 +144,7 @@ mut_burden_multiple <- function(project, purity){
   coeff <- summary(lm_fit)$coefficients[,1][2]
   
   ### Supplementary Fig. 5b
-  pdf(paste0("Analysis_results/Mutations/4_Mut_burden_plot/", project, "_mut_burden_multivariate.pdf"), width = 6, height = 4.5) 
+  pdf(paste0("Analysis_results/Mutations/4_Mut_burden_plot/", project, "_mut_burden_multivariate.pdf"), width = 6, height = 4.5, useDingbats=FALSE) 
   my_label <- paste0("adj. R-squared = ", r_squared, "\np = ", p_value)
   p <- ggplot(data = mut_burden_df, aes(x = age, y = log_mut)) + 
     geom_point(color = "black") +
@@ -148,17 +152,17 @@ mut_burden_multiple <- function(project, purity){
     ggtitle(project) +
     xlab("Age at diagnosis") +
     ylab("log10(total mutations)") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
           legend.title = element_blank(),
-          legend.text = element_text(size = 10, face="bold"),
+          legend.text = element_text(size = 14, face="bold"),
           panel.background = element_blank(),
           #panel.border = element_rect(linetype = "solid", fill = NA),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, size = 5,
+    annotate("label", x=-Inf, y = Inf, size = 6,
              label = my_label, hjust=0, vjust=1)
   print(p)
   dev.off()
@@ -181,5 +185,79 @@ df$q.value <- p.adjust(df$p.value, method = "BH")
 
 df$Sig <- ifelse(df$q.value < 0.05, TRUE, FALSE)
 write.csv(df, "Analysis_results/Mutations/Summary_mut_burden_with_age_multivariate.csv", row.names = FALSE)
+
+
+########## UCEC exclude MSI-H and POLE/POLD mutations ###########################################################################
+# mutational burden
+mut_burden <- read.csv("Analysis_results/Mutations/Mut_burden/UCEC_mutational_burdens.csv")
+mut_burden <- mut_burden[,c("Tumor_Sample_Barcode", "total")]
+mut_burden$Tumor_Sample_Barcode <- unlist(lapply(mut_burden$Tumor_Sample_Barcode,clean_id))
+
+# clinical
+clin <- read.csv("Data/clinical_XML_interest/TCGA-UCEC_clinical_XML_interest.csv")
+
+# merge clin and mut_burden
+df <- merge(clin, mut_burden, by.x = "patient", by.y = "Tumor_Sample_Barcode")
+df <- merge(df, purity, by.x = "patient", by.y = "patient")
+
+# MSI status
+MSI <- read.csv("Data/MSI_Status/UCEC_MSI_Status.csv")
+MSI <- MSI[,c("bcr_patient_barcode", "mononucleotide_and_dinucleotide_marker_panel_analysis_status")]
+colnames(MSI) <- c("patient", "msi")
+
+# consider only patients with MSI information
+shared_samples <- as.character(df$patient[df$patient %in% MSI$patient])
+MSI <- MSI[MSI$patient %in% shared_samples,]
+MSI_H_patients <- as.character(MSI[MSI$msi == "MSI-H",]$patient)
+
+df <- df[df$patient %in% shared_samples,]
+
+# PLOE/POLD1 mutations
+POLE_POLD1 <- read.csv("Analysis_results/Mutations/6_POLE_POLD1/UCEC_pol_mutations.csv")
+POLE_POLD1_patients <- as.character(POLE_POLD1[POLE_POLD1$POLD1 == 1 | POLE_POLD1$POLE == 1,]$X)
+
+
+### samples to be removed
+samples_to_be_removed <- unique(c(MSI_H_patients, POLE_POLD1_patients))
+
+df_removed <- df[!(df$patient %in% samples_to_be_removed),]
+dim(df_removed)
+
+### linear regression
+df_removed$log_mut <- log10(df_removed$total)
+
+# write source data
+write.csv(df_removed, "Source_Data/Supplementary_Fig_7c.csv", row.names = FALSE)
+
+# linear regression age and mutational burden: multivariate
+lm_fit <- lm(log_mut ~ age + purity + race + figo_stage + histologic_grade, data=df_removed) 
+p_value <- formatC(as.numeric(summary(lm_fit)$coefficients[,4][2]), format = "e", digits = 2)
+p_value_1 <- as.numeric(summary(lm_fit)$coefficients[,4][2])
+r_squared <- round(summary(lm_fit)$adj.r.squared,2)
+r_squared_1 <- summary(lm_fit)$adj.r.squared
+coeff <- summary(lm_fit)$coefficients[,1][2]
+
+pdf("Analysis_results/Mutations/UCEC_mut_burden_no_MSI-H_POLE_POLD1_multivariate.pdf", width = 6, height = 4.5, useDingbats=FALSE) 
+my_label <- paste0("adj. R-squared = ", r_squared, "\np = ", p_value)
+p <- ggplot(data = df_removed, aes(x = age, y = log_mut)) + 
+  geom_point(color = "black") +
+  geom_smooth(method = "lm", se = TRUE) +
+  ggtitle("UCEC (excluded MSI-H, POLE and POLD1 mutations)") +
+  xlab("Age at diagnosis") +
+  ylab("log10(total mutations)") +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size=15,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 14, face="bold"),
+        panel.background = element_blank(),
+        #panel.border = element_rect(linetype = "solid", fill = NA),
+        axis.line = element_line(colour = "black")) +
+  annotate("label", x=-Inf, y = Inf, size = 6,
+           label = my_label, hjust=0, vjust=1)
+print(p)
+dev.off()
 
 

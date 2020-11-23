@@ -24,7 +24,10 @@ corr_methy_expr_gene <- function(gene, df_methy, df_expr){
   colnames(expr) <- "expression"
   tmp_df <- merge(methy, expr, by = "row.names")
   cor_result <- cor.test(tmp_df$methylation, tmp_df$expression, method = "pearson")
-  return(as.numeric(cor_result$estimate))
+  names(cor_result$estimate) <- gene
+  res <- as.data.frame(cor_result$estimate)
+  colnames(res) <- "Pearson_cor"
+  return(res)
 }
 
 ### function to quantify correlation for a cancer
@@ -75,34 +78,38 @@ corr_methy_expr <- function(project){
   result_DEG_only <- lapply(DEG_only, corr_methy_expr_gene, df_methy = df_methy, df_expr = df_expr)
   result_other <- lapply(other_genes, corr_methy_expr_gene, df_methy = df_methy, df_expr = df_expr)
   
-  result_overlap_genes <- unlist(result_overlap_genes)
-  result_DMG_only <- unlist(result_DMG_only)
-  result_DEG_only <- unlist(result_DEG_only)
-  result_other <- unlist(result_other)
+  result_overlap_genes <- do.call(rbind, result_overlap_genes)
+  result_DMG_only <- do.call(rbind, result_DMG_only)
+  result_DEG_only <- do.call(rbind, result_DEG_only)
+  result_other <- do.call(rbind, result_other)
   
-  df_overlap <- as.data.frame(cbind(condition = rep("age_DMGs_DEGs", length(result_overlap_genes)), corr = result_overlap_genes))
-  df_DMG_only <- as.data.frame(cbind(condition = rep("age_DMGs", length(result_DMG_only)), corr = result_DMG_only))
-  df_DEG_only <- as.data.frame(cbind(condition = rep("age_DEGs", length(result_DEG_only)), corr = result_DEG_only))
-  df_other <- as.data.frame(cbind(condition = rep("others", length(result_other)), corr = result_other))
+  df_overlap <- as.data.frame(cbind(condition = rep("age_DMGs_DEGs", nrow(result_overlap_genes)), result_overlap_genes))
+  df_DMG_only <- as.data.frame(cbind(condition = rep("age_DMGs", nrow(result_DMG_only)), result_DMG_only))
+  df_DEG_only <- as.data.frame(cbind(condition = rep("age_DEGs", nrow(result_DEG_only)), result_DEG_only))
+  df_other <- as.data.frame(cbind(condition = rep("others", nrow(result_other)), result_other))
   
   df_all <- rbind(df_overlap, df_DMG_only, df_DEG_only, df_other)
-  df_all$corr <- as.numeric(as.character(df_all$corr))
-  write.csv(df_all, paste0("Analysis_results/Methylation/4_Density_plot_corr_coeff_methy_exp/", project, "_corr_coeff_methy_expr.csv", collapse = ""), row.names = FALSE)
   
-  ### Supplementary Fig. 10b
+  #df_all$corr <- as.numeric(as.character(df_all$Pearson_cor))
+  write.csv(df_all, paste0("Analysis_results/Methylation/4_Density_plot_corr_coeff_methy_exp/", project, "_corr_coeff_methy_expr.csv", collapse = ""), row.names = TRUE)
+  
+  ### Supplementary Fig. 14b
+  # write source data
+  write.csv(df_all, paste0("Source_Data/Supplementary_Fig_14b_", project, ".csv", collapse = ""), row.names = TRUE)
+  
   ### density plot
-  pdf(paste0("Analysis_results/Methylation/4_Density_plot_corr_coeff_methy_exp/", project, "_corr_coeff_methy_expr.pdf", collapse = ""), width = 8, height = 6) 
-  p <- ggplot(df_all, aes(x=corr, fill=condition)) + geom_density(alpha = 0.3) +
+  pdf(paste0("Analysis_results/Methylation/4_Density_plot_corr_coeff_methy_exp/", project, "_corr_coeff_methy_expr.pdf", collapse = ""), width = 6, height = 4.5) 
+  p <- ggplot(df_all, aes(x=Pearson_cor, fill=condition)) + geom_density(alpha = 0.3) +
     scale_fill_manual(values=c("#bd0026", "#225ea8", "#238b45", "#feb24c")) +
     ggtitle(project) +
     xlab("Pearson correlation coefficient") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
           legend.title = element_text(size = 12,face="bold"),
-          legend.text = element_text(size = 10),
+          legend.text = element_text(size = 12),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black"))
   print(p)
@@ -174,33 +181,36 @@ corr_methy_expr_UCEC <- function(project){
   result_DEG_only <- lapply(DEG_only, corr_methy_expr_gene, df_methy = df_methy, df_expr = df_expr)
   result_other <- lapply(other_genes, corr_methy_expr_gene, df_methy = df_methy, df_expr = df_expr)
   
-  result_overlap_genes <- unlist(result_overlap_genes)
-  result_DMG_only <- unlist(result_DMG_only)
-  result_DEG_only <- unlist(result_DEG_only)
-  result_other <- unlist(result_other)
+  result_overlap_genes <- do.call(rbind, result_overlap_genes)
+  result_DMG_only <- do.call(rbind, result_DMG_only)
+  result_DEG_only <- do.call(rbind, result_DEG_only)
+  result_other <- do.call(rbind, result_other)
   
-  df_overlap <- as.data.frame(cbind(condition = rep("age_DMGs_DEGs", length(result_overlap_genes)), corr = result_overlap_genes))
-  df_DMG_only <- as.data.frame(cbind(condition = rep("age_DMGs", length(result_DMG_only)), corr = result_DMG_only))
-  df_DEG_only <- as.data.frame(cbind(condition = rep("age_DEGs", length(result_DEG_only)), corr = result_DEG_only))
-  df_other <- as.data.frame(cbind(condition = rep("others", length(result_other)), corr = result_other))
+  df_overlap <- as.data.frame(cbind(condition = rep("age_DMGs_DEGs", nrow(result_overlap_genes)), result_overlap_genes))
+  df_DMG_only <- as.data.frame(cbind(condition = rep("age_DMGs", nrow(result_DMG_only)), result_DMG_only))
+  df_DEG_only <- as.data.frame(cbind(condition = rep("age_DEGs", nrow(result_DEG_only)), result_DEG_only))
+  df_other <- as.data.frame(cbind(condition = rep("others", nrow(result_other)), result_other))
   
   df_all <- rbind(df_overlap, df_DMG_only, df_DEG_only, df_other)
-  df_all$corr <- as.numeric(as.character(df_all$corr))
-  write.csv(df_all, paste0("Analysis_results/Methylation/4_Density_plot_corr_coeff_methy_exp/", project, "_corr_coeff_methy_expr.csv", collapse = ""), row.names = FALSE)
+  #df_all$corr <- as.numeric(as.character(df_all$corr))
+  write.csv(df_all, paste0("Analysis_results/Methylation/4_Density_plot_corr_coeff_methy_exp/", project, "_corr_coeff_methy_expr.csv", collapse = ""), row.names = TRUE)
+  
+  # write source data
+  write.csv(df_all, paste0("Source_Data/Supplementary_Fig_14b_", project, ".csv", collapse = ""), row.names = TRUE)
   
   ### density plot
-  pdf(paste0("Analysis_results/Methylation/4_Density_plot_corr_coeff_methy_exp/", project, "_corr_coeff_methy_expr.pdf", collapse = ""), width = 8, height = 6) 
-  p <- ggplot(df_all, aes(x=corr, fill=condition)) + geom_density(alpha = 0.3) +
+  pdf(paste0("Analysis_results/Methylation/4_Density_plot_corr_coeff_methy_exp/", project, "_corr_coeff_methy_expr.pdf", collapse = ""), width = 6, height = 4.5) 
+  p <- ggplot(df_all, aes(x=Pearson_cor, fill=condition)) + geom_density(alpha = 0.3) +
     scale_fill_manual(values=c("#bd0026", "#225ea8", "#238b45", "#feb24c")) +
     ggtitle(project) +
     xlab("Pearson correlation coefficient") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
-          legend.title = element_text(size = 12,face="bold"),
-          legend.text = element_text(size = 10),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
+          legend.title = element_text(size = 14,face="bold"),
+          legend.text = element_text(size = 14),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black"))
   print(p)

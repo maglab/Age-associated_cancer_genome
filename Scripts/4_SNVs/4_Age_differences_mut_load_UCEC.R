@@ -41,18 +41,23 @@ colnames(cong_table_df) <- c("Mutational_burden", "Age", "value")
 
 my_label <- paste0("p = ", p_value)
 
+# write source data
+write.csv(cong_table_df, "Source_Data/Fig_4b.csv", row.names = FALSE)
 ### Fig. 4a
-pdf("Analysis_results/Mutations/5_UCEC_low_burden_age_SNVs/Age_and_mut_burden_stacked.pdf", width = 4, height = 4)
+pdf("Analysis_results/Mutations/5_UCEC_low_burden_age_SNVs/Age_and_mut_burden_stacked.pdf", width = 4, height = 4, useDingbats=FALSE)
 p <- ggplot(aes(x = Age, y = value, fill = Mutational_burden), data = cong_table_df) + 
   geom_bar(stat = "identity", position="fill") +
-  geom_text(aes(label=value), position="fill", vjust=2) +
+  geom_text(aes(label=value), position="fill", vjust=2.5) +
   ylab("proportion")  +
   ggtitle("UCEC mutations and age") +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 11),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  scale_fill_discrete(name = "Num mutations") +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.title.x = element_text(size = 14,face = "bold"),
+        axis.title.y = element_text(size = 14,face = "bold"),
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 12),
         panel.background = element_blank(),
         #panel.border = element_rect(linetype = "solid", fill = NA),
         axis.line = element_line(colour = "black")) +

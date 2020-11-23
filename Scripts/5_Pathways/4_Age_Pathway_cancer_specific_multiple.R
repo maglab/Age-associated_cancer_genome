@@ -163,21 +163,25 @@ df <- result_df[result_df$Sig == TRUE,]
 df$direction <- ifelse(df$estimate > 0, "increase", "decrease")
 cols <- c("decrease" = "#1D91C0", "increase" = "#a50f15")
 
-pdf("Analysis_results/Pathway_alterations/Summary_age_multivariate_pathway_alterations_dot_plot.pdf", width = 8, height = 4) 
+# write source data
+write.csv(df, "Source_Data/Fig_5b.csv", row.names = FALSE)
+
+pdf("Analysis_results/Pathway_alterations/Summary_age_multivariate_pathway_alterations_dot_plot.pdf", width = 8, height = 4, useDingbats=FALSE) 
 p <- ggplot(data = df, aes(x = pathway, y = cancer_type)) +
   geom_point(aes(fill = direction, size = -log10(q.value)), colour="black", pch=21) +
   scale_x_discrete(limits = names(sort(table(as.character(df$pathway)), decreasing = TRUE))) +
   scale_y_discrete(limits = names(sort(table(as.character(df$cancer_type)), decreasing = FALSE))) +
   scale_fill_manual(values = cols) +
-  scale_size_continuous(range = c(2, 5)) +
-  ggtitle("Cancer-specific association between age and pathway alterations") +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=10,face="bold"),
+  scale_size_continuous(range = c(3, 6)) +
+  ggtitle("Cancer type-specific: Age and pathway alterations") +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 12, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 12),
+        #axis.title.x = element_text(size=15,face="bold"),
+        axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        legend.title = element_text(size = 10),
-        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
         panel.background = element_blank(),
         panel.border = element_rect(linetype = "solid", fill = NA),
         panel.grid.major = element_line(colour = "#d9d9d9"),

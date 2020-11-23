@@ -53,7 +53,22 @@ PANCAN_mut <- lapply(projects, get_mut_burden)
 PANCAN_mut <- do.call(rbind, PANCAN_mut)
 dim(PANCAN_mut) # 8585 samples
 
-### select only samples with mutation loads < 1000,
+# remove MSI-H tumours from COAD, READ, STAD, UCEC
+MSI_COAD <- read.csv("Data/MSI_Status/COAD_MSI_Status.csv")
+MSI_COAD <- as.character(MSI_COAD[MSI_COAD$mononucleotide_and_dinucleotide_marker_panel_analysis_status == "MSI-H",]$bcr_patient_barcode)
+MSI_READ <- read.csv("Data/MSI_Status/READ_MSI_Status.csv")
+MSI_READ <- as.character(MSI_READ[MSI_READ$mononucleotide_and_dinucleotide_marker_panel_analysis_status == "MSI-H",]$bcr_patient_barcode)
+MSI_STAD <- read.csv("Data/MSI_Status/STAD_MSI_Status.csv")
+MSI_STAD <- as.character(MSI_STAD[MSI_STAD$mononucleotide_and_dinucleotide_marker_panel_analysis_status == "MSI-H",]$bcr_patient_barcode)
+MSI_UCEC <- read.csv("Data/MSI_Status/UCEC_MSI_Status.csv")
+MSI_UCEC <- as.character(MSI_UCEC[MSI_UCEC$mononucleotide_and_dinucleotide_marker_panel_analysis_status == "MSI-H",]$bcr_patient_barcode)
+
+MSI_patients <- c(MSI_COAD, MSI_READ, MSI_STAD, MSI_UCEC)
+
+PANCAN_mut <- PANCAN_mut[!(PANCAN_mut$Tumor_Sample_Barcode %in% MSI_patients),]
+dim(PANCAN_mut) # 8448 samples
+
+### select only samples with mutation loads < 1000 and not MSI-H
 maf_file_1 <- maf_file_1[maf_file_1$Patient_ID %in% PANCAN_mut$Tumor_Sample_Barcode,]
 num_samples <- length(unique(as.character(maf_file_1$Patient_ID)))
 num_samples

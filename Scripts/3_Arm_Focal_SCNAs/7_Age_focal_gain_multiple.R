@@ -148,7 +148,7 @@ test_age_gain <- function(Unique.Name, project, purity){
 }
 
 
-# function to test mutation and age for each cancer type
+# function to test focal SCNA and age for each cancer type
 multivariate_result <- list()
 
 regions <- as.character(gain_df$Unique.Name)

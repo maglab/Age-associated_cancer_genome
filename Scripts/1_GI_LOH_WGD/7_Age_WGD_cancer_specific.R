@@ -39,7 +39,7 @@ WGD_age <- function(cancer_type){
   
   write.csv(result, paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", cancer_type, "_univariate_age_WGD.csv", collapse = ""), row.names = FALSE)
   
-  pdf(paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", cancer_type, "_univariate_age_WGD.pdf", collapse = ""), width = 3, height = 4) 
+  pdf(paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", cancer_type, "_univariate_age_WGD.pdf", collapse = ""), width = 3, height = 4, useDingbats=FALSE) 
   my_label <- paste0("p = ", p_value)
   p <- ggplot(df, aes(x=wgd, y=age, fill=wgd)) + 
     geom_violin(trim = FALSE, scale = "width") + 
@@ -47,16 +47,16 @@ WGD_age <- function(cancer_type){
     ggtitle(cancer_type) +
     xlab("Whole Genome Duplication") +
     ylab("Age at diagnosis") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 14),
+          axis.text.y = element_text(size = 14),
+          axis.title.x = element_text(size=14,face="bold"),
+          axis.title.y = element_text(size=14,face="bold"),
           legend.title = element_blank(),
           legend.position = "none",
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, 
+    annotate("label", x=-Inf, y = Inf, size = 5,
              label = my_label, hjust=0, vjust=1)
   print(p)
   dev.off()
@@ -84,55 +84,11 @@ for_multiple_regression <- results[results$Sig == TRUE,]$cancer_type
 
 # sub-function to select a logistic regression model depends on cancer type
 model_selection <- function(project){
-  if(project %in% c("ACC")){
-    model <- wgd ~ age + gender + pathologic_stage
-  } else if(project %in% c("BLCA")){
-    model <- wgd ~ age + gender + race + pathologic_stage + histologic_grade + subtype + smoking_history
-  } else if(project %in% c("BRCA")){
-    model <- wgd ~ age + gender + race + pathologic_stage + ER_status
-  } else if(project %in% c("CESC")){
-    model <- wgd ~ age + figo_stage + histologic_grade
-  } else if(project %in% c("CHOL", "KICH", "LUAD")){
-    model <- wgd ~ age + gender + race + pathologic_stage + smoking_history
-  } else if(project %in% c("COAD", "READ")){
-    model <- wgd ~ age + gender + pathologic_stage + subtype
-  } else if(project %in% c("DLBC", "SARC")){
+  if(project %in% c("SARC")){
     model <- wgd ~ age + gender + race + subtype
-  } else if(project %in% c("ESCA")){
-    model <- wgd ~ age + gender + histologic_grade + alcohol_history
-  } else if(project %in% c("GBM", "LAML", "PCPG", "THYM")){
-    model <- wgd ~ age + gender + race
-  } else if(project %in% c("HNSC")){
-    model <- wgd ~ age + gender + race + histologic_grade + smoking_history + alcohol_history
-  } else if(project %in% c("KIRC")){
-    model <- wgd ~ age + gender + race + pathologic_stage + histologic_grade
-  } else if(project %in% c("KIRP", "SKCM")){
-    model <- wgd ~ age + gender + race + pathologic_stage
-  } else if(project %in% c("LGG")){
-    model <- wgd ~ age + gender + race + histologic_grade
-  } else if(project %in% c("LIHC")){
-    model <- wgd ~ age + gender + race + pathologic_stage + histologic_grade + alcohol_history + Hepatitis
-  } else if(project %in% c("LUSC")){
-    model <- wgd ~ age + gender + pathologic_stage + smoking_history
-  } else if(project %in% c("MESO")){
-    model <- wgd ~ age + gender + race + pathologic_stage + subtype
   } else if(project %in% c("OV", "UCEC")){
     model <- wgd ~ age + race + figo_stage + histologic_grade
-  } else if(project %in% c("PAAD")){
-    model <- wgd ~ age + gender + race + pathologic_stage + histologic_grade + alcohol_history
-  } else if(project %in% c("PRAD")){
-    model <- wgd ~ age + race + gleason_score
-  } else if(project %in% c("STAD")){
-    model <- wgd ~ age + gender + pathologic_stage + histologic_grade
-  } else if(project %in% c("TGCT")){
-    model <- wgd ~ age + race + pathologic_stage + subtype
-  } else if(project %in% c("THCA")){
-    model <- wgd ~ age + gender + pathologic_stage + subtype
-  } else if(project %in% c("UCS")){
-    model <- wgd ~ age + race + figo_stage
-  } else if(project %in% c("UVM")){
-    model <- wgd ~ age + gender + pathologic_stage
-  }
+  } 
   return(model)
 }
 
@@ -142,7 +98,7 @@ wgd_age <- function(project){
   clin <- read.csv(paste0("Data/clinical_XML_interest/TCGA-", project, "_clinical_XML_interest.csv", collapse = ""))
   df_tmp <- merge(df_tmp, clin, by.x = "patient", by.y = "patient")
   head(df_tmp)
-  
+  write.csv(df_tmp, paste0("Source_Data/Fig_1e_", project, ".csv", collapse = ""), row.names = FALSE)
   model <- model_selection(project)
   logit_fit <- logistf(formula = model, data=df_tmp, family = "binomial")
   summary(logit_fit)
@@ -154,24 +110,24 @@ wgd_age <- function(project){
   write.csv(result, paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", project, "_multivariate_age_WGD.csv", collapse = ""), row.names = FALSE)
   
   ### Fig. 1e
-  pdf(paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", project, "_multivariate_age_WGD.pdf", collapse = ""), width = 3, height = 4) 
+  pdf(paste0("Analysis_results/Structural_Alterations/3_Age_WGD/", project, "_multivariate_age_WGD.pdf", collapse = ""), width = 3, height = 4, useDingbats=FALSE) 
   my_label <- paste0("p = ", p_value)
   p <- ggplot(df_tmp, aes(x=wgd, y=age, fill=wgd)) + 
     geom_violin(trim = FALSE, scale = "width") + 
     geom_boxplot(width = 0.4, fill = "white") +
     ggtitle(project) +
-    xlab("Whole Genome Duplication") +
+    xlab("WGD") +
     ylab("Age at diagnosis") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 14),
+          axis.text.y = element_text(size = 14),
+          axis.title.x = element_text(size=14,face="bold"),
+          axis.title.y = element_text(size=14,face="bold"),
           legend.title = element_blank(),
           legend.position = "none",
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, 
+    annotate("label", x=-Inf, y = Inf, size = 5,
              label = my_label, hjust=0, vjust=1)
   print(p)
   dev.off()

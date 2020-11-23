@@ -254,7 +254,7 @@ age_DEGs_project <- function(project, purity, bmIDs){
                     clin = clin, model = model, Hiseq_patients = Hiseq_patients, GA_patients = GA_patients)
   results <- do.call(rbind, results)
   results$q.value <- p.adjust(results$p.value, method = "BH")
-  results$Sig <- ifelse(results$q.value < 0.1, TRUE, FALSE)
+  results$Sig <- ifelse(results$q.value < 0.05, TRUE, FALSE)
   write.csv(results, paste0("Analysis_results/Gene_Expression/1_Gene_expression_with_age/", project, "_gene_expression_with_age.csv"), row.names = FALSE)
 }
 

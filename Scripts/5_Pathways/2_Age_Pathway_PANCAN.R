@@ -3,13 +3,9 @@
 setwd("/Users/kasitchatsirisupachai/Desktop/Age_differences_cancer/")
 
 library(broom)
-library(logistf)
 library(ggplot2)
 library(ggrepel)
 library(reshape2)
-library(pheatmap)
-library(circlize)
-library(ComplexHeatmap)
 library(scales)
 
 ### read data
@@ -99,26 +95,29 @@ for(i in 1:nrow(df)){
 df$my_colour <- factor(my_colour)
 df$pathway <- c("Cell Cycle", "HIPPO", "MYC", "NOTCH", "NRF2", "PI3K", "RTK/RAS", "TP53", "TGF-Beta", "WNT")
 
+# write source data
+write.csv(df, "Source_Data/Fig_5a.csv", row.names = FALSE)
+
 ### Fig. 5a
-pdf("Analysis_results/Pathway_alterations/PANCAN_pathway_alterations_multivariate_summary.pdf", width = 6, height = 4.5) 
+pdf("Analysis_results/Pathway_alterations/PANCAN_pathway_alterations_multivariate_summary.pdf", width = 6, height = 4.5, useDingbats=FALSE) 
 p <- ggplot(aes(x = estimate, y = -log10(q.value), color = my_colour, label = pathway), data = df) +
-  geom_point(size = 2.5) + 
+  geom_point(size = 3) + 
   scale_color_manual(values = c("#bdbdbd", "#a50f15")) +
   xlab("Regression coefficient") +
   ylab("-log10(adjusted p-value)") +
-  ggtitle("PANCAN association between age and pathway alteration") +
+  ggtitle("PANCAN: Age and pathway alteration") +
   xlim(c(-0.013,0.013)) +
-  geom_label_repel(size = 4) +
+  geom_label_repel(size = 5) +
   geom_hline(
     yintercept = c(-log10(0.05),-log10(0.05)),
     col = "#bdbdbd",
     linetype = "dashed",
     size = 0.5) +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size=15,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
         legend.position = "none",
         panel.background = element_blank(),
         axis.line = element_line(colour = "black"))

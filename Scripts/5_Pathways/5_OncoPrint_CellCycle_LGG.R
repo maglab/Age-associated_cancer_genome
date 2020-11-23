@@ -110,12 +110,17 @@ age <- annot_df$age
 tmp_pathway_df_1 <- tmp_pathway_df_1[,as.character(annot_df$patient)]
 tmp_pathway_df_1 <- as.matrix(tmp_pathway_df_1)
 
-# annotation age and mut burden
+# write source data
+write.csv(tmp_pathway_df_1, "Source_Data/Fig_5c_Cell_Cycle.csv")
+
+# annotation age
 ha <- columnAnnotation(age = age,
                        col = list(age = colorRamp2(c(min(age), max(age)), c("#edf8b1", "#1d91c0"))),
                        annotation_legend_param = list(age = list(title = "age", 
                                                                  at = c(min(age), median(age), max(age)),
-                                                                 labels = c(min(age), median(age), max(age)))))
+                                                                 labels = c(min(age), median(age), max(age)),
+                                                                 title_gp = gpar(fontsize=13, fontface="bold"),
+                                                                 labels_gp = gpar(fontsize=13))))
 ha
 
 
@@ -135,14 +140,21 @@ alter_fun = list(
 )
 
 heatmap_legend_param = list(title = "Alterations", at = c("AMP", "DEL", "FUSION", "MUT", "EPISIL"), 
-                            labels = c("Gain", "Deletion", "Fusion", "Mutations", "Epigenetic silencing"))
+                            labels = c("Gain", "Deletion", "Fusion", "Mutations", "Epigenetic silencing"),
+                            title_gp = gpar(fontsize = 13, fontface = "bold"),
+                            labels_gp = gpar(fontsize = 13))
 
 height_pdf = (length(genes) * 0.2) + 2
-pdf(paste0("Analysis_results/Pathway_alterations/4_Heatmap_pathway/", project, "_pathway_heatmap_", pathway, ".pdf"), width = 12, height = height_pdf)
+pdf(paste0("Analysis_results/Pathway_alterations/4_Heatmap_pathway/", project, "_pathway_heatmap_", pathway, "_1.pdf"), 
+    width = 12, height = height_pdf, useDingbats=FALSE)
 p <- oncoPrint(tmp_pathway_df_1, alter_fun = alter_fun, col = col,
                remove_empty_columns = FALSE,
                column_order = as.character(annot_df$patient),top_annotation = ha,
                column_title = paste0(project, ": Cell Cycle", collapse = ""),
+               column_title_gp = gpar(fontsize = 16, fontface = "bold"),
+               row_title_gp = gpar(fontsize = 14),
+               row_names_gp = gpar(fontsize = 14),
+               pct_gp = gpar(fontsize = 14),
                heatmap_legend_param = heatmap_legend_param)
 print(p)
 dev.off()

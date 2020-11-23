@@ -33,22 +33,26 @@ corr_methy_exp <- function(project){
   xmax <- max(abs(min(df$methylation_coeff)), abs(max(df$methylation_coeff)))
   ymax <- max(abs(min(df$expression_coeff)), abs(max(df$expression_coeff)))
   
-  ### Supplementary Fig. 8
-  pdf(paste0("Analysis_results/Methylation/2_Corr_coeff_methy_exp/", project, "_corr_coeff_methylation_expression.pdf", collapse = ""), width = 6, height = 4.5)
+  # write source data
+  #write.csv(df, paste0("Source_Data/Supplementary_Fig_11_", project, ".csv"), row.names = FALSE)
+  ### Supplementary Fig. 11
+  pdf(paste0("Analysis_results/Methylation/2_Corr_coeff_methy_exp/", project, "_corr_coeff_methylation_expression.pdf", collapse = ""), width = 6, height = 4.5, useDingbats=FALSE)
   p <- ggscatter(df, x = "methylation_coeff", y = "expression_coeff",
                  add = "reg.line",  # Add regressin line) +
                  add.params = list(color = "blue", fill = "lightgray"), # Customize reg. line
-                 conf.int = TRUE) +
-    stat_cor(method = "pearson", label.x = 0.3*max(df$methylation_coeff), label.y = ymax) +
+                 conf.int = TRUE,
+                 cor.coeff.args = list(method = "pearson", label.x = 10, label.sep = "\n")) +
+    stat_cor(method = "pearson", label.x = 0.05*max(df$methylation_coeff), label.y = ymax,
+             size = 5.5) +
     ggtitle(project) +
     xlim(-xmax,xmax) + ylim(-ymax,ymax) +
-    xlab("Regression coefficient of methylation with age") +
-    ylab("Regression coefficient of gene expression with age") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=10,face="bold"),
-          axis.title.y = element_text(size=10,face="bold"))
+    xlab("Methylation regression coefficient") +
+    ylab("Expression regression coefficient") +
+    theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 16),
+          axis.text.y = element_text(size = 16),
+          axis.title.x = element_text(size=16,face="bold"),
+          axis.title.y = element_text(size=16,face="bold"))
     
   print(p)
   dev.off()

@@ -47,6 +47,9 @@ my_df <- my_df[,c("Project", "Condition", "Freq")]
 
 write.csv(my_df, "Analysis_results/Methylation/Overlap_age-DMGs_age-DEGs.csv", row.names = FALSE)
 
+# write source data
+write.csv(my_df, "Source_Data/Fig_6c.csv", row.names = FALSE)
+
 ### Fig. 6c
 pdf("Analysis_results/Methylation/Overlap_age-DMGs_age-DEGs.pdf", width = 8, height = 4) 
 p <- ggplot(data = my_df, aes(x = Project, y = Freq, fill = Condition)) +
@@ -54,13 +57,13 @@ p <- ggplot(data = my_df, aes(x = Project, y = Freq, fill = Condition)) +
   ylab("proportion")  +
   ggtitle("Overlap genes between age-DMGs and age-DEGs") +
   scale_fill_manual(values = c("#0571b0", "#f4a582", "#92c5de", "#ca0020")) +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 15, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 15),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(size=12,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
         legend.title = element_text(size = 12,face="bold"),
-        legend.text = element_text(size = 10),
+        legend.text = element_text(size = 12),
         panel.background = element_blank(),
         axis.line = element_line(colour = "black"))
 print(p)

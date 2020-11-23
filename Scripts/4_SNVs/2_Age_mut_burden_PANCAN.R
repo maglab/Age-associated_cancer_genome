@@ -28,6 +28,9 @@ PANCAN_mut <- lapply(projects, get_mut_burden)
 PANCAN_mut <- do.call(rbind, PANCAN_mut)
 PANCAN_mut <- merge(PANCAN_mut, clinical, by.x = "Tumor_Sample_Barcode", by.y = "patient")
 
+# write source data
+write.csv(PANCAN_mut, "Source_Data/Fig_4a.csv", row.names = FALSE)
+
 # linear regression age and mutational burden
 lm_fit <- lm(log_mut ~ age + cancer_type + gender + race, data=PANCAN_mut) 
 p_value <- formatC(as.numeric(summary(lm_fit)$coefficients[,4][2]), format = "e", digits = 2)
@@ -36,8 +39,8 @@ r_squared <- round(summary(lm_fit)$adj.r.squared,2)
 r_squared_1 <- summary(lm_fit)$r.squared
 coeff <- summary(lm_fit)$coefficients[,1][2]
 
-### Supplementary Fig. 5a
-pdf("Analysis_results/Mutations/4_Mut_burden_plot/PANCAN_multivariate_mut_burden.pdf", width = 8, height = 6)
+### Fig. 4a
+pdf("Analysis_results/Mutations/4_Mut_burden_plot/PANCAN_multivariate_mut_burden.pdf", width = 6, height = 4.5, useDingbats=FALSE)
 my_label <- paste0("adj. R-squared = ", r_squared, "\np = ", p_value)
 p <- ggplot(data = PANCAN_mut, aes(x = age, y = log_mut)) + 
   geom_point(aes(color = cancer_type), size = 0.5) +
@@ -45,13 +48,13 @@ p <- ggplot(data = PANCAN_mut, aes(x = age, y = log_mut)) +
   ggtitle("PANCAN") +
   xlab("Age at diagnosis") +
   ylab("log10(total mutations)") +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.title.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=14,face="bold"),
         legend.title = element_blank(),
-        legend.text = element_text(size = 10, face="bold"),
+        legend.text = element_text(size = 10,face="bold"),
         panel.background = element_blank(),
         axis.line = element_line(colour = "black")) +
   annotate("label", x=-Inf, y = Inf, size = 5,

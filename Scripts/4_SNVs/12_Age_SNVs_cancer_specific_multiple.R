@@ -87,7 +87,12 @@ test_age_mut_gene <- function(gene, project, purity){
   head(clin)
   
   ### read gene-sample mutation table
-  mut_df <- read.csv(paste0("Analysis_results/Mutations/1_table_mutations_samples/", project, "_mutations_filter_hypermutated.csv", collapse = ""))
+  if(project %in% c("COAD", "READ", "STAD", "UCEC")){
+    mut_df <- read.csv(paste0("Analysis_results/Mutations/1_table_mutations_samples/", project, "_mutations_filter_hypermutated_and_MSI-H.csv", collapse = ""))
+  } else {
+    mut_df <- read.csv(paste0("Analysis_results/Mutations/1_table_mutations_samples/", project, "_mutations_filter_hypermutated.csv", collapse = ""))
+  }
+  
   row.names(mut_df) <- mut_df$X
   mut_df$X <- NULL
   
@@ -150,20 +155,25 @@ write.csv(result_df, "Analysis_results/Mutations/Summary_age_SNVs_multivariate_n
 df <- result_df[result_df$Sig == TRUE,]
 dim(df)
 
-# Fig. 4e
-pdf("Analysis_results/Mutations/Summary_age_SNVs_multivariate_new.pdf", width = 8, height = 6) 
+# write source data
+write.csv(df, "Source_Data/Fig_4f.csv", row.names = FALSE)
+
+# Fig. 4f
+pdf("Analysis_results/Mutations/Summary_age_SNVs_multivariate_new.pdf", width = 8, height = 6, useDingbats=FALSE) 
 p <- ggplot(aes(x = estimate, y = -log10(q.value), color = cancer_type, label = gene), data = df) +
-  geom_point(size = 2.5) + 
+  geom_point(size = 3) + 
   xlab("Regression coefficient") +
   ylab("-log10(adjusted p-value)") +
-  ggtitle("Cancer type-specific association between age and mutations") +
-  xlim(c(-0.11,0.11)) +
-  geom_label_repel(size = 3.5) +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 11),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  ggtitle("Cancer type-specific: Age and mutations") +
+  xlim(c(-0.15,0.15)) +
+  geom_label_repel(size = 4.5) +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
+        axis.title.x = element_text(size = 16,face="bold"),
+        axis.title.y = element_text(size = 16,face="bold"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 14),
         panel.background = element_blank(),
         panel.border = element_rect(linetype = "solid", fill = NA),
         axis.line = element_line(colour = "black"))

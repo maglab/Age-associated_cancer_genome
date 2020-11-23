@@ -1,5 +1,5 @@
 ### Plot SCNA profile from GISTIC2 output
-### Fig. 2f-g and Supplementary Fig. 3
+### Fig. 2f-g and Supplementary Fig. 5
 setwd("/Users/kasitchatsirisupachai/Desktop/Age_differences_cancer")
 
 library(ggplot2)
@@ -47,7 +47,9 @@ plot_CNA_heatmap <- function(project){
                       col = list(age = colorRamp2(c(min(age), max(age)), c("#edf8b1", "#1d91c0"))),
                       annotation_legend_param = list(title = "age", 
                                                      at = c(min(age), median(age), max(age)),
-                                                     labels = c(min(age), median(age), max(age))))
+                                                     labels = c(min(age), median(age), max(age)),
+                                                     title_gp = gpar(fontsize=13, fontface="bold"),
+                                                     labels_gp = gpar(fontsize=13)))
   ha
   
   # sort df by age
@@ -56,15 +58,30 @@ plot_CNA_heatmap <- function(project){
   
   values_by_arm <- values_by_arm[complete.cases(values_by_arm),]
   
+  # save source data
+  if(project == "LGG"){
+    write.csv(values_by_arm, "Source_Data/Fig_2f.csv")
+  } else if(project == "UCEC"){
+    write.csv(values_by_arm, "Source_Data/Fig_2g.csv")
+  } else {
+    write.csv(values_by_arm, paste0("Source_Data/Supplementary_Fig_5_", project, ".csv", collapse = ""))
+  }
+  
   ### heatmap
   my_col = colorRamp2(c(min(values_by_arm), 0, max(values_by_arm)), c("#1d91c0", "white", "#bd0026"))
   
-  pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_arm_new/GISTIC_arm_heatmap/", project, "_arm_heatmap.pdf", collapse = ""), width = 8, height = 4) 
+  pdf(paste0("Analysis_results/CNAs/3_Age_biases_recurrent_SCNAs/Age_recurrent_arm_new/GISTIC_arm_heatmap/", project, "_arm_heatmap.pdf", collapse = ""), 
+      width = 8, height = 4, useDingbats=FALSE) 
   p <- Heatmap(values_by_arm, name = "Copy Number Changes", cluster_columns = FALSE, cluster_rows = FALSE,
                show_row_names = FALSE,
                col = my_col,
                left_annotation = ha,
-               column_title = project)
+               column_title = project,
+               column_title_gp = gpar(fontsize = 16, fontface = "bold"),
+               column_names_gp = gpar(fontsize = 13),
+               heatmap_legend_param = list(title = "CN changes",
+                                           title_gp = gpar(fontsize = 12, fontface = "bold"), 
+                                           labels_gp = gpar(fontsize = 12)))
   print(p)
   dev.off()
 

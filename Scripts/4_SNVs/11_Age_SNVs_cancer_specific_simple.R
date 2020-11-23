@@ -2,7 +2,6 @@
 setwd("/Users/kasitchatsirisupachai/Desktop/Age_differences_cancer/")
 
 library(broom)
-library(logistf)
 
 ### read data
 clinical <- read.csv("Data/all_clin_XML.csv")
@@ -66,7 +65,12 @@ age_mut <- function(project, clinical){
   print(paste("Start working: ", project))
   
   ### read gene-sample mutation table
-  mut_df <- read.csv(paste0("Analysis_results/Mutations/1_table_mutations_samples/", project, "_mutations_filter_hypermutated.csv", collapse = ""))
+  if(project %in% c("COAD", "READ", "STAD", "UCEC")){
+    mut_df <- read.csv(paste0("Analysis_results/Mutations/1_table_mutations_samples/", project, "_mutations_filter_hypermutated_and_MSI-H.csv", collapse = ""))
+  } else {
+    mut_df <- read.csv(paste0("Analysis_results/Mutations/1_table_mutations_samples/", project, "_mutations_filter_hypermutated.csv", collapse = ""))
+  }
+  
   row.names(mut_df) <- mut_df$X
   mut_df$X <- NULL
   genes <- colnames(mut_df)

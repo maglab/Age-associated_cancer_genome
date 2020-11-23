@@ -113,6 +113,13 @@ test_age_mut_gene <- function(project, gene, purity){
     # merge with purity
     df <- merge(df, purity, by.x = "patient", by.y = "patient")
     
+    # write source data
+    if(project == "UCEC"){
+      write.csv(df, paste0("Source_Data/Fig_4d_", gene, ".csv", collapse = ""), row.names = FALSE)
+    }else{
+      write.csv(df, paste0("Source_Data/Supplementary_Fig_8b_", project, "_", gene, ".csv", collapse = ""), row.names = FALSE)
+    }
+    
     # logistic regression
     logit_fit <- logistf(formula = model, data = df, family = "binomial")
     
@@ -125,27 +132,27 @@ test_age_mut_gene <- function(project, gene, purity){
     result_df <- as.data.frame(result[result$term == "age",])
     result_df$term <- gene
     result_df$cancer_type <- project
-    colnames(result_df) <- c("gene", "estimate", "std.error", "conf.low", "conf.high", "df.error", "p.value", "cancer_type")
-    result_df <- result_df[,c("cancer_type", "gene", "estimate", "std.error", "conf.low", "conf.high", "df.error", "p.value")]
+    colnames(result_df) <- c("gene", "estimate", "std.error", "conf.low", "conf.high", "statistics", "df.error", "p.value", "cancer_type")
+    result_df <- result_df[,c("cancer_type", "gene", "estimate", "std.error", "conf.low", "conf.high", "statistics", "df.error", "p.value")]
     
     ### plot
     df$mut_1 <- ifelse(df$mut == 1, TRUE, FALSE)
     
-    ### Fig. 4c and Supplementary Fig. 6b
+    ### Fig. 4d and Supplementary Fig. 8b
     my_label <- paste0("p = ", round(result_df$p.value, 4))
     pdf(paste0("Analysis_results/Mutations/6.1_POLE_POLD1_results/", project, "_age_", gene,"_mut.pdf", collapse = ""),
-        width = 3, height = 4) 
+        width = 3, height = 4, useDingbats=FALSE) 
     p <- ggplot(aes(x = mut_1, y = age, fill = mut_1), data = df) + 
       geom_violin(trim = FALSE, scale = "width") + 
       geom_boxplot(width = 0.4, fill = "white") +
-      ggtitle(paste0(project, ": ", gene, " mutation and age", collapse = "")) +
+      ggtitle(paste0(project, ": ", gene, " mutation", collapse = "")) +
       xlab("mutation") +
       ylab("Age at diagnosis") +
-      theme(plot.title = element_text(size = 11, face = "bold", hjust = 0.5),
-            axis.text.x = element_text(size = 10),
-            axis.text.y = element_text(size = 10),
-            axis.title.x = element_text(size=11,face="bold"),
-            axis.title.y = element_text(size=11,face="bold"),
+      theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+            axis.text.x = element_text(size = 14),
+            axis.text.y = element_text(size = 14),
+            axis.title.x = element_text(size=14,face="bold"),
+            axis.title.y = element_text(size=14,face="bold"),
             legend.title = element_blank(),
             legend.position = "none",
             panel.background = element_blank(),

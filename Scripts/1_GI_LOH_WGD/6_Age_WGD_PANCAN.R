@@ -32,7 +32,7 @@ result <- result[,c("term", "estimate", "std.error", "conf.low", "conf.high",
                     "statistic", "odds", "odds_conf.low", "odds_conf.high", "p.value")]
 write.csv(result, "Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_univariate_age_WGD.csv", row.names = FALSE)
 
-pdf("Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_univariate_age_WGD.pdf", width = 3, height = 4) 
+pdf("Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_univariate_age_WGD.pdf", width = 3, height = 4, useDingbats=FALSE) 
 my_label <- paste0("p = ", p_value)
 p <- ggplot(df, aes(x=wgd, y=age, fill=wgd)) + 
   geom_violin(trim = FALSE, scale = "width") + 
@@ -40,18 +40,18 @@ p <- ggplot(df, aes(x=wgd, y=age, fill=wgd)) +
   #geom_jitter(aes(color = cancer_type)) +
   #ggtitle("Association between age and whole genome duplication") +
   ggtitle("PANCAN") +
-  xlab("Whole Genome Duplication") +
+  xlab("WGD") +
   ylab("Age at diagnosis") +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.title.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=14,face="bold"),
         legend.title = element_blank(),
         legend.position = "none",
         panel.background = element_blank(),
         axis.line = element_line(colour = "black")) +
-  annotate("label", x=-Inf, y = Inf, 
+  annotate("label", x=-Inf, y = Inf, size = 5,
            label = my_label, hjust=0, vjust=1)
 print(p)
 dev.off()
@@ -76,24 +76,25 @@ result <- result[,c("term", "estimate", "std.error", "conf.low", "conf.high",
 write.csv(result, "Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_multivariate_age_WGD.csv", row.names = FALSE)
 
 ### Fig. 1e
-pdf("Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_multivariate_age_WGD.pdf", width = 3, height = 4) 
+write.csv(df, "Source_Data/Fig_1e_PANCAN.csv")
+pdf("Analysis_results/Structural_Alterations/3_Age_WGD/PANCAN_multivariate_age_WGD.pdf", width = 3, height = 4, useDingbats=FALSE) 
 my_label <- paste0("p = ", p_value)
 p <- ggplot(df, aes(x=wgd, y=age, fill=wgd)) +
   geom_violin(trim = FALSE, scale = "width") + 
   geom_boxplot(width = 0.4, fill = "white") +
   ggtitle("PANCAN") +
-  xlab("Whole Genome Duplication") +
+  xlab("WGD") +
   ylab("Age at diagnosis") +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.title.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=14,face="bold"),
         legend.title = element_blank(),
         legend.position = "none",
         panel.background = element_blank(),
         axis.line = element_line(colour = "black")) +
-  annotate("label", x=-Inf, y = Inf, 
+  annotate("label", x=-Inf, y = Inf, size = 5,
            label = my_label, hjust=0, vjust=1)
 print(p)
 dev.off()

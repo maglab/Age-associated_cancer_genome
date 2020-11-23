@@ -174,6 +174,9 @@ overall_SCNAscore_age <- function(project){
   df_tmp <- merge(df_tmp, clin, by.x = "patient", by.y = "patient")
   head(df_tmp)
   
+  # source data
+  write.csv(df_tmp, paste0("Source_Data/Supplementary_Fig_3a_", project, ".csv"), row.names = FALSE)
+  
   model <- model_selection(project)
   lm_fit <- lm(formula = model, data=df_tmp)  # fit linear model
   summary(lm_fit)
@@ -182,9 +185,9 @@ overall_SCNAscore_age <- function(project){
   r_squared <- round(summary(lm_fit)$adj.r.squared, 2)
   
 
-  ### Supplementary Fig. 2
+  ### Supplementary Fig. 3
   my_label <- paste0("adj.R-squared = ", r_squared, "\np = ", p_value)
-  pdf(paste0("Analysis_results/CNAs/2_SCNA_scores/Multivariate_Age_overall_SCNA_score/", project, "_multivariate_age_overall_SCNA.pdf", collapse = ""), width = 6, height = 4.5) 
+  pdf(paste0("Analysis_results/CNAs/2_SCNA_scores/Multivariate_Age_overall_SCNA_score/", project, "_multivariate_age_overall_SCNA.pdf", collapse = ""), width = 6, height = 4.5, useDingbats=FALSE) 
   p <- ggplot(data = df_tmp, aes(x = age, y = sum_score)) + 
     geom_point(color='black') +
     geom_smooth(method = "lm") +
@@ -192,16 +195,16 @@ overall_SCNAscore_age <- function(project){
     ggtitle(project) +
     xlab("Age at diagnosis") +
     ylab("Overall SCNA score") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
           legend.title = element_blank(),
-          legend.text = element_text(size = 10, face="bold"),
+          legend.text = element_text(size = 14, face="bold"),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, size = 5,
+    annotate("label", x=-Inf, y = Inf, size = 6,
              label = my_label, hjust=0, vjust=1)
   print(p)
   dev.off()
@@ -292,6 +295,9 @@ focal_SCNAscore_age <- function(project){
   df_tmp <- merge(df_tmp, clin, by.x = "patient", by.y = "patient")
   head(df_tmp)
   
+  # source data
+  write.csv(df_tmp, paste0("Source_Data/Supplementary_Fig_3c_", project, ".csv"), row.names = FALSE)
+  
   model <- model_selection(project)
   lm_fit <- lm(formula = model, data=df_tmp)  # fit linear model
   summary(lm_fit)
@@ -299,9 +305,9 @@ focal_SCNAscore_age <- function(project){
   p_value <- formatC(as.numeric(summary(lm_fit)$coefficients[,4][2]), format = "e", digits = 2)
   r_squared <- round(summary(lm_fit)$adj.r.squared, 2)
   
-  ### Supplementary Fig. 2
+  ### Supplementary Fig. 3
   my_label <- paste0("adj. R-squared = ", r_squared, "\np = ", p_value)
-  pdf(paste0("Analysis_results/CNAs/2_SCNA_scores/Multivariate_Age_focal_SCNA_score/", project, "_multivariate_age_focal_SCNA.pdf", collapse = ""), width = 6, height = 4.5) 
+  pdf(paste0("Analysis_results/CNAs/2_SCNA_scores/Multivariate_Age_focal_SCNA_score/", project, "_multivariate_age_focal_SCNA.pdf", collapse = ""), width = 6, height = 4.5, useDingbats=FALSE) 
   p <- ggplot(data = df_tmp, aes(x = age, y = rank_norm_focal)) + 
     geom_point(color='black') +
     geom_smooth(method = "lm") +
@@ -309,16 +315,16 @@ focal_SCNAscore_age <- function(project){
     ggtitle(project) +
     xlab("Age at diagnosis") +
     ylab("Focal SCNA score") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
           legend.title = element_blank(),
-          legend.text = element_text(size = 10, face="bold"),
+          legend.text = element_text(size = 14, face="bold"),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, size = 5,
+    annotate("label", x=-Inf, y = Inf, size = 6,
              label = my_label, hjust=0, vjust=1)
   print(p)
   dev.off()
@@ -409,6 +415,9 @@ chromarm_SCNAscore_age <- function(project){
   df_tmp <- merge(df_tmp, clin, by.x = "patient", by.y = "patient")
   head(df_tmp)
   
+  # source data
+  write.csv(df_tmp, paste0("Source_Data/Supplementary_Fig_3b_", project, ".csv"), row.names = FALSE)
+  
   model <- model_selection(project)
   lm_fit <- lm(formula = model, data=df_tmp)  # fit linear model
   summary(lm_fit)
@@ -416,9 +425,9 @@ chromarm_SCNAscore_age <- function(project){
   p_value <- formatC(as.numeric(summary(lm_fit)$coefficients[,4][2]), format = "e", digits = 2)
   r_squared <- round(summary(lm_fit)$adj.r.squared, 2)
   
-  ### Supplementary Fig. 2
+  ### Supplementary Fig. 3
   my_label <- paste0("adj. R-squared = ", r_squared, "\np = ", p_value)
-  pdf(paste0("Analysis_results/CNAs/2_SCNA_scores/Multivariate_Age_chrom_arm_SCNA_score/", project, "_multivariate_age_chrom_arm_SCNA.pdf", collapse = ""), width = 6, height = 4.5) 
+  pdf(paste0("Analysis_results/CNAs/2_SCNA_scores/Multivariate_Age_chrom_arm_SCNA_score/", project, "_multivariate_age_chrom_arm_SCNA.pdf", collapse = ""), width = 6, height = 4.5, useDingbats=FALSE) 
   p <- ggplot(data = df_tmp, aes(x = age, y = chrom_arm)) + 
     geom_point(color='black') +
     geom_smooth(method = "lm") +
@@ -426,16 +435,16 @@ chromarm_SCNAscore_age <- function(project){
     ggtitle(project) +
     xlab("Age at diagnosis") +
     ylab("Chrom/arm SCNA score") +
-    theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10),
-          axis.title.x = element_text(size=12,face="bold"),
-          axis.title.y = element_text(size=12,face="bold"),
+    theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title.x = element_text(size=15,face="bold"),
+          axis.title.y = element_text(size=15,face="bold"),
           legend.title = element_blank(),
-          legend.text = element_text(size = 10, face="bold"),
+          legend.text = element_text(size = 14, face="bold"),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    annotate("label", x=-Inf, y = Inf, size = 5,
+    annotate("label", x=-Inf, y = Inf, size = 6,
              label = my_label, hjust=0, vjust=1)
   print(p)
   dev.off()
@@ -521,8 +530,10 @@ for(i in 1:nrow(SCNA_age_result_1)){
 
 SCNA_age_result_1$chromarm_colour <- factor(chromarm_colour)
 
+write.csv(SCNA_age_result_1, "Source_Data/Fig_2_abc.csv", row.names = FALSE)
+
 ### Fig. 2a (Overall)
-pdf("Analysis_results/CNAs/2_SCNA_scores/Summary_multivariate_age_overall_SCNA.pdf", width = 6, height = 4.5) 
+pdf("Analysis_results/CNAs/2_SCNA_scores/Summary_multivariate_age_overall_SCNA.pdf", width = 6, height = 4.5, useDingbats=FALSE) 
 p <- ggplot(aes(x = estimate_overall, y = -log10(q.value_overall), size = median_overall, 
                 color = overall_colour, label = cancer_type), data = SCNA_age_result_1) +
   geom_point() +
@@ -532,17 +543,17 @@ p <- ggplot(aes(x = estimate_overall, y = -log10(q.value_overall), size = median
   ylab("-log10(adjusted p-value)") +
   ggtitle("Overall SCNA score") +
   xlim(c(-0.025,0.025)) +
-  geom_label_repel(size = 3) +
+  geom_label_repel(size = 4) +
   geom_hline(
     yintercept = c(-log10(0.05),-log10(0.05)),
     col = "#bdbdbd",
     linetype = "dashed",
     size = 0.5) +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size=15,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
         legend.position = "none",
         panel.background = element_blank(),
         axis.line = element_line(colour = "black"))
@@ -551,7 +562,7 @@ dev.off()
 
 
 ### Fig. 2b (Chrom/Arm level)
-pdf("Analysis_results/CNAs/2_SCNA_scores/Summary_multivariate_age_chromarm_SCNA.pdf", width = 6, height = 4.5) 
+pdf("Analysis_results/CNAs/2_SCNA_scores/Summary_multivariate_age_chromarm_SCNA.pdf", width = 6, height = 4.5, useDingbats=FALSE) 
 p <- ggplot(aes(x = estimate_chromarm, y = -log10(q.value_chromarm), size = median_chromarm, 
                 color = chromarm_colour, label = cancer_type), data = SCNA_age_result_1) +
   geom_point() +
@@ -561,17 +572,17 @@ p <- ggplot(aes(x = estimate_chromarm, y = -log10(q.value_chromarm), size = medi
   ylab("-log10(adjusted p-value)") +
   ggtitle("Chromosome/arm SCNA score") +
   xlim(c(-0.015,0.015)) +
-  geom_label_repel(size = 3) +
+  geom_label_repel(size = 4) +
   geom_hline(
     yintercept = c(-log10(0.05),-log10(0.05)),
     col = "#bdbdbd",
     linetype = "dashed",
     size = 0.5) +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size=15,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
         legend.position = "none",
         panel.background = element_blank(),
         axis.line = element_line(colour = "black"))
@@ -579,7 +590,7 @@ print(p)
 dev.off()
 
 ### Fig. 2c (Focal level)
-pdf("Analysis_results/CNAs/2_SCNA_scores/Summary_multivariate_age_focal_SCNA.pdf", width = 6, height = 4.5) 
+pdf("Analysis_results/CNAs/2_SCNA_scores/Summary_multivariate_age_focal_SCNA.pdf", width = 6, height = 4.5, useDingbats=FALSE) 
 p <- ggplot(aes(x = estimate_focal, y = -log10(q.value_focal), size = median_focal, 
                 color = focal_colour, label = cancer_type), data = SCNA_age_result_1) +
   geom_point() +
@@ -589,17 +600,17 @@ p <- ggplot(aes(x = estimate_focal, y = -log10(q.value_focal), size = median_foc
   ylab("-log10(adjusted p-value)") +
   ggtitle("Focal SCNA score") +
   xlim(c(-0.01,0.01)) +
-  geom_label_repel(size = 3) +
+  geom_label_repel(size = 4) +
   geom_hline(
     yintercept = c(-log10(0.05),-log10(0.05)),
     col = "#bdbdbd",
     linetype = "dashed",
     size = 0.5) +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size=15,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
         legend.position = "none",
         panel.background = element_blank(),
         axis.line = element_line(colour = "black"))

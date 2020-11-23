@@ -85,19 +85,19 @@ GSEA_GO <- function(project, bmIDs){
   table(merged_df$group_1)
   
   # keep only top 8 for each group for plotting
-  ID_1 <- merged_df[merged_df$group_1 == "Expression Down",]$ID[1:8]
-  ID_2 <- merged_df[merged_df$group_1 == "Expression Up",]$ID[1:8]
-  ID_3 <- merged_df[merged_df$group_1 == "Methylation Down",]$ID[1:8]
-  ID_4 <- merged_df[merged_df$group_1 == "Methylation Up",]$ID[1:8]
+  ID_1 <- as.character(merged_df[merged_df$group_1 == "Expression Down",]$ID[1:8])
+  ID_2 <- as.character(merged_df[merged_df$group_1 == "Expression Up",]$ID[1:8])
+  ID_3 <- as.character(merged_df[merged_df$group_1 == "Methylation Down",]$ID[1:8])
+  ID_4 <- as.character(merged_df[merged_df$group_1 == "Methylation Up",]$ID[1:8])
   
   all_IDs <- c(ID_1, ID_2, ID_3, ID_4)
   all_IDs <- all_IDs[!(is.na(all_IDs))]
   merged_df_1 <- merged_df[merged_df$ID %in% all_IDs,]
-  merged_df_1 <- merged_df_1[unlist(lapply(merged_df_1$Description, nchar)) < 60,]  # remove too long GO term
+  merged_df_1 <- merged_df_1[unlist(lapply(as.character(merged_df_1$Description), nchar)) < 60,]  # remove too long GO term
   
   ### Plot
   ### Fig. 6e and Supplementary Fig. 11
-  pdf(paste0("Analysis_results/Methylation/5_GSEA/", project, "_GSEA_GO_expr_methy.pdf", collapse = ""), width = 6, height = 4.5) 
+  pdf(paste0("Analysis_results/Methylation/5_GSEA/", project, "_GSEA_GO_expr_methy.pdf", collapse = ""), width = 6, height = 4.5, useDingbats=FALSE) 
   p <- ggplot(merged_df_1, aes(x = group, y = Description)) + 
     geom_point(aes(fill = enrichmentScore, size = -log(p.adjust)), colour="black", pch=21) +
     scale_size_continuous(range = c(1, 4)) +

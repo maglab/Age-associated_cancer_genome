@@ -6,32 +6,7 @@ library(logistf)
 library(ggplot2)
 library(ggrepel)
 library(reshape2)
-
-
-### read data
-clinical <- read.csv("Data/all_clin_XML.csv")
-projects <- unique(as.character(clinical$cancer_type))
-
-# clean id function
-clean_id <- function(id){
-  tmp <- gsub(pattern = "[.]", replacement = "-", id)
-  tmp <- unlist(strsplit(tmp, split = "-"))[1:3]
-  return(paste0(tmp, collapse = "-"))
-}
-
-### function to read mut burden for each cancer type and combine together
-get_mut_burden <- function(project){
-  mut_burden_df <- read.csv(paste0("Analysis_results/Mutations/Mut_burden/", project, "_mutational_burdens.csv", collapse = ""))
-  mut_burden_df$Tumor_Sample_Barcode <- unlist(lapply(as.character(mut_burden_df$Tumor_Sample_Barcode), clean_id))
-  mut_burden_df <- mut_burden_df[,c("Tumor_Sample_Barcode", "total")]
-  mut_burden_df <- mut_burden_df[mut_burden_df$total < 1000,]
-  print(paste0(project, ": ", nrow(mut_burden_df)))
-  return(mut_burden_df)
-}
-
-PANCAN_mut <- lapply(projects, get_mut_burden)
-PANCAN_mut <- do.call(rbind, PANCAN_mut)
-dim(PANCAN_mut) # 8585 samples
+library(dplyr)
 
 ###################################################################################################
 ### Logistic regression to test whether age associates with increased/decreased possibility of a gene to be mutated
@@ -61,9 +36,9 @@ test_age_mut_gene <- function(gene, mut_df, clinical){
   
   result_df <- as.data.frame(result[result$term == "age",])
   result_df$term <- gene
-  colnames(result_df) <- c("gene", "estimate", "std.error", "conf.low", "conf.high", "df.error", "p.value")
-  result_df <- result_df[,c("gene", "estimate", "std.error", "conf.low", "conf.high", "df.error", "p.value")]
-
+  colnames(result_df) <- c("gene", "estimate", "std.error", "conf.low", "conf.high", "statistic", "df.error", "p.value")
+  result_df <- result_df[,c("gene", "estimate", "std.error", "conf.low", "conf.high", "statistic", "df.error", "p.value")]
+  
   return(result_df)
 }
 
@@ -99,26 +74,30 @@ for(i in 1:nrow(df)){
 df$my_colour <- factor(my_colour)
 df$gene <- as.character(df$gene)
 
-### Fig. 4d
-pdf("Analysis_results/Mutations/PANCAN_age_SNVs_multivariate_new.pdf", width = 6, height = 4.5) 
+# write source data
+write.csv(df, "Source_Data/Fig_4e.csv", row.names = FALSE)
+
+### Fig. 4e
+# plot
+pdf("Analysis_results/Mutations/PANCAN_age_SNVs_multivariate_new.pdf", width = 6, height = 4.5, useDingbats=FALSE) 
 p <- ggplot(aes(x = estimate, y = -log10(q.value), color = my_colour, label = gene), data = df) +
-  geom_point(size = 2.5) + 
+  geom_point(size = 3) + 
   scale_color_manual(values = c("#1d91c0", "#bdbdbd", "#a50f15")) +
   xlab("Regression coefficient") +
   ylab("-log10(adjusted p-value)") +
-  ggtitle("PANCAN association between age and mutations") +
-  xlim(c(-0.04,0.04)) +
-  geom_label_repel(size = 3.5) +
+  ggtitle("PANCAN: Age and mutations") +
+  xlim(c(-0.041,0.041)) +
+  geom_label_repel(size = 4.5) +
   geom_hline(
     yintercept = c(-log10(0.05),-log10(0.05)),
     col = "#bdbdbd",
     linetype = "dashed",
     size = 0.5) +
-  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
-        axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 11),
-        axis.title.x = element_text(size=12,face="bold"),
-        axis.title.y = element_text(size=12,face="bold"),
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size=15,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
         legend.position = "none",
         panel.background = element_blank(),
         panel.border = element_rect(linetype = "solid", fill = NA),
