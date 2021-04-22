@@ -1,6 +1,4 @@
 # Age-associated_cancer_genome
 
-This GitHub provides supplementary figures, supplementary tables, and custom scripts used for the following unpublished article:
-Chatsirisupachai K, Lesluyes T, Paraoan L, Van Loo P, de Magalhaes JP. "An Integrative Analysis of the Age-Associated Multi-Omic Landscape across Cancers"
-
-The preprint can be found here: https://www.biorxiv.org/content/10.1101/2020.08.25.266403v1
+This GitHub provides supplementary figures, supplementary tables, and custom scripts used for the following article:
+Chatsirisupachai K, Lesluyes T, Paraoan L, Van Loo P, de Magalhaes JP. An integrative analysis of the age-associated multi-omic landscape across cancers. Nature Communications 12, 2345, doi:10.1038/s41467-021-22560-y (2021).
